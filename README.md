@@ -38,6 +38,6 @@ To set up and run this project, follow these steps:
 ---
 
 ## Acknowledgments
-- The authors of **FFDNet** for their original researchand implementation.
+- The authors of **FFDNet** for their original research and implementation.
 - Researchers contributing to the development of diffusion models in image denoising
 - **ImageNet** for providing a large-scale, high-quality image dataset.
