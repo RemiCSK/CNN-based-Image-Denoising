@@ -39,7 +39,7 @@ class Small_MNIST(nn.Module):
 class FFDNet_inspired_small_mnist(nn.Module):
 
     def __init__(self):
-        super(Small_MNIST, self).__init__()
+        super(FFDNet_inspired_small_mnist, self).__init__()
         self.model = nn.Sequential(
             # REVERSIBLE DOWN SAMPLING is done in the forward function to apply it only to images and not the noise map
             # First convolution layer
