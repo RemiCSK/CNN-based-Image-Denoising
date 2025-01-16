@@ -91,7 +91,7 @@ optimizer = optim.Adam(small_mnist_model.parameters(), lr=1e-3)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, min_lr=1e-4)
 
 # Training loop
-num_epochs = 10
+num_epochs = 100
 for epoch in range(num_epochs):
     small_mnist_model.train()
     running_loss = 0.0
@@ -137,8 +137,8 @@ print("Training complete")
 # Create the directory where all models will be stored if the directory doesn't already exist
 os.makedirs('trained_models', exist_ok=True)
 # Define the file paths
-model_path = f'trained_models/small_mnist_model_{num_epochs}_epochs.pth'
-optimizer_path = f'trained_models/optimizer_mnist_model_{num_epochs}_epochs.pth'
+model_path = f'trained_models/small_mnist_model_{num_epochs}_epochs_{noise_std}_noise_std.pth'
+optimizer_path = f'trained_models/optimizer_mnist_model_{num_epochs}_epochs_{noise_std}_noise_std.pth'
 # Save the model state dictionary
 torch.save(small_mnist_model.state_dict(), model_path)
 
