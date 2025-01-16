@@ -33,9 +33,10 @@ except Exception as e:
     print(f"Error loading data: {e}")
 
 
-# CHOOSE THE AMOUNT OF NOISE TO ADD TO THE IMAGES
+# CHOOSE THE AMOUNT OF NOISE TO ADD TO THE IMAGES THIS HAS TO MATCH THE NOISE LEVEL MAP FOR TRAINING. Note that for the moment we use the same noise map for all images
 noise_mean = 0.0
 noise_std = 0.1
+
 
 def add_gaussian_noise(tensor, noise_mean, noise_std):
     #noise = torch.randn(tensor.size(),device=tensor.device) * noise_std + noise_mean
@@ -43,8 +44,15 @@ def add_gaussian_noise(tensor, noise_mean, noise_std):
     return tensor + noise
 
 
+# CREATE A UNIFORM NOISE LEVEL MAP THAT MATCHES DIMENSIONS OF DOWNSAMPLED IMAGES
+def create_uniform_noise_level_map(batch_size, height, width, noise_std):
+    noise_level_map = torch.full((batch_size, 1, height // 2, width // 2), noise_std) # Creates noise level map with only noise_std values in it.
+    return noise_level_map
+
+
+
 ######### IMPORT THE MODEL ########
-model = FFDNet_inspired_small_mnist
+model = FFDNet_inspired_small_mnist()
 # Print the model architecture
 print(f"FFDNet_inspired_small_mnist architecture: {FFDNet_inspired_small_mnist}")
 
@@ -71,11 +79,14 @@ for epoch in range(num_epochs):
         # Add Gaussian noise to the images
         noisy_images = add_gaussian_noise(images, noise_mean, noise_std)
 
+        b, _, h, w = images.size()   # create noise level map in loop to make sure dimensions match and it will be usefull later when we will want to use different noise level maps
+        noise_level_map = create_uniform_noise_level_map(b, h, w, noise_std)  #noise_std to match amount of noise added to image
+
         # Reset the gradient
         optimizer.zero_grad()
 
         # Forward
-        outputs = model(noisy_images)
+        outputs = model(noisy_images, noise_level_map)
 
         # Compute the loss
         loss = criterion(outputs, images)
