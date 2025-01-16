@@ -63,7 +63,7 @@ noisy_images_test = add_gaussian_noise(images_test, noise_mean,noise_std).to(dev
 
 
 ##### LOAD THE MODEL #####
-epoch = 100 # number of epoch of the already trained model
+epoch = 30 # number of epoch of the already trained model
 noise_std_train = 0.1 # amount of noise added during the training of the already trained model
 model_path = f'trained_models/small_mnist_model_{epoch}_epochs_{noise_std_train}_noise_std.pth'
 optimizer_path = f'trained_models/optimizer_mnist_model_{epoch}_epochs_{noise_std_train}_noise_std.pth'
@@ -116,7 +116,7 @@ for i in range(5):
     ax.axis("off")
 
 # Add a title to the entire figure
-fig.suptitle("Original, Noisy, and Denoised MNIST Images of the train dataset. Real noise std : {noise_std_train}", fontsize=16)
+fig.suptitle("Original, Noisy, and Denoised MNIST Images of the train dataset", fontsize=16)
 plt.show()
 
 
@@ -166,7 +166,7 @@ with torch.no_grad():
     end_time = time.time()
     test_loss = criterion(denoised_images_test, images_test.to(device)).item()
     time_taken = end_time - start_time
-print(f'It took {time_taken} seconds to denoise {batchsize} images from the test dataset and the MSE loss on those images is {test_loss:.4f}')
+print(f'It took {time_taken} to denoise {batchsize} images from the test dataset and the MSE loss on those images is {test_loss:.4f}')
 
 
 print(noisy_images_test.shape)
