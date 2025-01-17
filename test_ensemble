@@ -13,7 +13,7 @@ import torch.optim as optim
 import time
 from torchvision import datasets, transforms
 
-from every_model_architecture import FFDNet_inspired_small_mnist # Import the FFDNet_inspired_small_mnist model class defined in an other file
+from every_model_architecture import FFDNet_mnist_ensemble, FFDNet_inspired_small_mnist_extend,FFDNet_inspired_small_mnist # Import the FFDNet_inspired_small_mnist model class defined in an other file
 
 # CHECK GPU or choose CPU if no GPU available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -118,27 +118,29 @@ noise_std_vector = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3] #This one here is only for 
 ##### LOAD THE MODEL #####
 num_epochs = 10 # number of epoch of the already trained model
 noise_std_train = 0.1 # amount of noise added during the training of the already trained model
-model_path = f'trained_models/map_var_ffdnet_inspired_mnist_{num_epochs}_epochs_{noise_std_vector}_noise_std_vector.pth'
-optimizer_path = f'trained_models/optimizer_map_var_ffdnet_inspired_mnist{num_epochs}_epochs_{noise_std_vector}_noise_std_vector.pth'
-
-FFDNet_inspired_small_mnist_model = FFDNet_inspired_small_mnist()  # Import class from every_model_architecture.py
-print(f"Architecture of small_mnist_model: {FFDNet_inspired_small_mnist_model}")
-optimizer = optim.Adam(FFDNet_inspired_small_mnist_model.parameters())
+model_path = f'trained_models/FFDNet_mnist_ensemble_{num_epochs}_epochs_{noise_std_vector}_noise_std_vector.pth'
+optimizer_path = f'trained_models/optimizer_FFDNet_mnist_ensemble{num_epochs}_epochs_{noise_std_vector}_noise_std_vector.pth'
+model1 = FFDNet_inspired_small_mnist()
+model2 = FFDNet_inspired_small_mnist_extend()
+model = FFDNet_mnist_ensemble(model1, model2)
+  # Import class from every_model_architecture.py
+print(f"Architecture of small_mnist_model: {model}")
+optimizer = optim.Adam(model.parameters())
 
 # Load the model state dictionary with map_location to the appropriate device
-FFDNet_inspired_small_mnist_model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))   #map_location allows to use GPU or CPU even if the model was trained on a GPU
+model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))   #map_location allows to use GPU or CPU even if the model was trained on a GPU
 
 # Load the optimizer state dictionary with map_location to the appropriate device
 optimizer.load_state_dict(torch.load(optimizer_path, map_location=torch.device(device)))
 
 
 # Move the model to the appropriate device
-FFDNet_inspired_small_mnist_model.to(device)
+model.to(device)
 
 # Set the model to evaluation mode
-FFDNet_inspired_small_mnist_model.eval()
+model.eval()
 
-print(f"The model : FFDNet_inspired_small_mnist_{num_epochs}_epochs_{noise_std_train}_noise_std and the optimizer states have been loaded.")
+print(f"The model : FFDNet_inspired_ensemble_small_mnist_{num_epochs}_epochs_{noise_std_train}_noise_std and the optimizer states have been loaded.")
 
 
 
@@ -151,10 +153,10 @@ with torch.no_grad():
     random_noise_std_guess = noise_std_range[torch.randint(0, len(noise_std_range), (b,), device=device)].view(-1, 1, 1, 1)
     
     # Create the noise level map using the random noise_std_guess values
-    noise_level_map = create_uniform_noise_level_map(b, h, w, random_noise_std_guess)
+    noise_level_map = create_noise_level_map(b, h, w, random_noise_std_guess)
     
     # Denoise the images
-    denoised_images_train = FFDNet_inspired_small_mnist_model(noisy_images_train, noise_level_map)
+    denoised_images_train = model(noisy_images_train, noise_level_map)
 
 # Plot the original, noisy, and denoised images
 fig, axes = plt.subplots(3, 5, figsize=(15, 9))
@@ -218,7 +220,7 @@ def results_test_presentation(noise_std_vector, uniform=True):
         start_time = time.time()
         
         # Pass noisy images and noise map to the model
-        denoised_images = FFDNet_inspired_small_mnist_model(noisy_images_test, noise_level_map)
+        denoised_images = model(noisy_images_test, noise_level_map)
         
         # End timing
         end_time = time.time()
@@ -255,7 +257,7 @@ def results_test_presentation(noise_std_vector, uniform=True):
     # Add a title to the entire figure
     map_type = "Uniform" if uniform else "Non-Uniform"
     fig.suptitle(f"Original, Noisy, and Denoised MNIST Images of the test dataset\n"
-                 f"Using the model: FFDNet_inspired_small_mnist_{num_epochs}_epochs with noise_std_vector\n"
+                 f"Using the model: FFDNet_inspired_ensemble_small_mnist_{num_epochs}_epochs with noise_std_vector\n"
                  f"Random noise_std values from {noise_std_vector} used for the {map_type} noise level map.\n"
                  f"It took {time_taken} seconds to denoise {noisy_images_test.shape[0]} images and the MSE loss on those images is {test_loss:.4f}", fontsize=16)
     plt.show()
@@ -274,4 +276,3 @@ results_test_presentation(noise_std_vector, uniform=True)
 
 # Test with non-uniform noise maps
 results_test_presentation(noise_std_vector, uniform=False)
-
