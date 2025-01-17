@@ -95,6 +95,34 @@ class FFDNet_inspired_small_mnist_extend(nn.Module):
         return self.model(concat_input)
 
 
+# Create a very similar model to the one just above but we use a single intermediate convolution layer
+
+class FFDNet_inspired_small_mnist_extend2(nn.Module):
+
+    def __init__(self):
+        super(FFDNet_inspired_small_mnist_extend2, self).__init__()
+        self.model = nn.Sequential(
+            # REVERSIBLE DOWN SAMPLING is done in the forward function to apply it only to images and not the noise map
+            # First convolution layer
+            nn.Conv2d(in_channels=5, out_channels=64, kernel_size=3, padding=1),   # 4+1=5 input channels because we will add a noise map
+            nn.ReLU(inplace=True),
+            # 2 convolution layers with batch normalization and ReLU
+            *[nn.Sequential(
+            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True)) for _ in range(1)],
+            # Final convolution layer
+            nn.Conv2d(in_channels=64, out_channels=4, kernel_size=3, padding=1),
+            # ADD THE REVERSE OF THE DOWN SAMPLING
+            nn.PixelShuffle(2)
+)
+    def forward(self, x, noise_level_map):
+        downsampled_images = nn.PixelUnshuffle(2)(x) #reversible down sample images in 4 sub images
+        #### CHECKING DIMENSION OF THE NOISE LEVEL MAP ####
+        batch_size, _, h, w = downsampled_images.size()
+        noise_level_map = noise_level_map.view(batch_size, 1, h, w)   # reshape the noise level map to match dimension of down sample images if necessary
+        concat_input = torch.cat([downsampled_images, noise_level_map], dim=1) # concatenates the 4 downsampled images and the noise level map
+        return self.model(concat_input)
 
 
 
@@ -146,6 +174,36 @@ class FFDNet_mnist_ensemble(nn.Module):
 
     def forward(self, x, noise_level_map):
         return 0.5 * (self.model1(x, noise_level_map) + self.model2(x, noise_level_map))  # Average the output of the two models
-    
 
 
+# Defiine a class to combine the output of two models with a small neural network instead of averaging
+class Neural_combining(nn.Module):
+    def __init__(self):
+        super(Neural_combining, self).__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(2, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 1, kernel_size=3, padding=1)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+
+
+
+
+# Define a class for an other ensemble model. But the combination is done via a small neural network.
+class FFDNet_mnist_ensemble_neural(nn.Module):
+    def __init__(self, model1, model2):
+        super(FFDNet_mnist_ensemble_neural, self).__init__()
+        self.model1 = model1
+        self.model2 = model2
+        self.neural_combining = Neural_combining()
+
+
+    def forward(self, x, noise_level_map):
+        output1 = self.model1(x, noise_level_map)
+        output2 = self.model2(x, noise_level_map)
+        combined_output = torch.cat([output1, output2], dim=1)  # CONCATENATE output of both models
+        return self.neural_combining(combined_output)
