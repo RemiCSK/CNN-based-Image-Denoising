@@ -63,6 +63,43 @@ class FFDNet_inspired_small_mnist(nn.Module):
         concat_input = torch.cat([downsampled_images, noise_level_map], dim=1) # concatenates the 4 downsampled images and the noise level map
         return self.model(concat_input)
 
+
+
+# Create a very similar model to the one just above but we simply add a convolution layer
+
+class FFDNet_inspired_small_mnist_extend(nn.Module):
+
+    def __init__(self):
+        super(FFDNet_inspired_small_mnist_extend, self).__init__()
+        self.model = nn.Sequential(
+            # REVERSIBLE DOWN SAMPLING is done in the forward function to apply it only to images and not the noise map
+            # First convolution layer
+            nn.Conv2d(in_channels=5, out_channels=64, kernel_size=3, padding=1),   # 4+1=5 input channels because we will add a noise map
+            nn.ReLU(inplace=True),
+            # 2 convolution layers with batch normalization and ReLU
+            *[nn.Sequential(
+            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True)) for _ in range(3)],
+            # Final convolution layer
+            nn.Conv2d(in_channels=64, out_channels=4, kernel_size=3, padding=1),
+            # ADD THE REVERSE OF THE DOWN SAMPLING
+            nn.PixelShuffle(2)
+)
+    def forward(self, x, noise_level_map):
+        downsampled_images = nn.PixelUnshuffle(2)(x) #reversible down sample images in 4 sub images
+        #### CHECKING DIMENSION OF THE NOISE LEVEL MAP ####
+        batch_size, _, h, w = downsampled_images.size()
+        noise_level_map = noise_level_map.view(batch_size, 1, h, w)   # reshape the noise level map to match dimension of down sample images if necessary
+        concat_input = torch.cat([downsampled_images, noise_level_map], dim=1) # concatenates the 4 downsampled images and the noise level map
+        return self.model(concat_input)
+
+
+
+
+
+
+
 class FFDNet_inspired_small_cifar(nn.Module):
 
     def __init__(self):
@@ -94,3 +131,21 @@ class FFDNet_inspired_small_cifar(nn.Module):
         concat_input = torch.cat([downsampled_images, noise_level_map], dim=1)  # Shape (B, 13, H/2, W/2)
 
         return self.model(concat_input)
+
+
+
+
+
+#### Define an ensemble model that takes the average of the output of two models ####
+
+class FFDNet_mnist_ensemble(nn.Module):
+    def __init__(self, model1, model2):
+        super(FFDNet_mnist_ensemble, self).__init__()
+        self.model1 = model1
+        self.model2 = model2
+
+    def forward(self, x, noise_level_map):
+        return 0.5 * (self.model1(x, noise_level_map) + self.model2(x, noise_level_map))  # Average the output of the two models
+    
+
+
