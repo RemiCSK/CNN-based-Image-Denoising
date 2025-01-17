@@ -71,7 +71,7 @@ noise_std_guess = 0.1
 
 # TO CREATE A UNIFORM NOISE LEVEL MAP THAT MATCHES DIMENSIONS OF DOWNSAMPLED IMAGES
 def create_uniform_noise_level_map(batch_size, height, width, noise_std):
-    noise_level_map = torch.full((batch_size, 1, height // 2, width // 2), noise_std) # Creates noise level map with only noise_std values in it.
+    noise_level_map = torch.full((batch_size, 1, height // 2, width // 2), noise_std).to(device) # Creates noise level map with only noise_std values in it.
     return noise_level_map
 
 
