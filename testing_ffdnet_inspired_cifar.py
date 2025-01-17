@@ -77,10 +77,10 @@ def create_uniform_noise_level_map(batch_size, height, width, noise_std):
 
 
 ##### LOAD THE MODEL #####
-num_epochs = 10 # number of epoch of the already trained model
+num_epochs = 100 # number of epoch of the already trained model
 noise_std_train = 0.1 # amount of noise added during the training of the already trained model
 model_path = f'trained_models/FFDNet_inspired_small_cifar_{num_epochs}_epochs_{noise_std_train}_noise_std.pth'
-optimizer_path = f'trained_models/optimizer_FFDNet_inspired_small_cifar{num_epochs}_epochs_{noise_std_train}_noise_std.pth'
+optimizer_path = f'trained_models/optimizer_FFDNet_inspired_small_cifar_{num_epochs}_epochs_{noise_std_train}_noise_std.pth'
 
 FFDNet_inspired_small_cifar_model = FFDNet_inspired_small_cifar()  # Import class from every_model_architecture.py
 print(f"Architecture of small_cifar_model: {FFDNet_inspired_small_cifar_model}")
