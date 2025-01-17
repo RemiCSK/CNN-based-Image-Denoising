@@ -15,10 +15,17 @@ We will also explore the use of **diffusion models** for image denoising, aiming
 
 ## Objectives
 
-1. **Implement FFDNet**: Implement the FFDNet algorithm for image denoising, with a focus on performance across different types of noise and datasets.
-2. **Evaluate performance**: Test FFDNet on various image datasets such as *ImageNet*, exploring various types of noise such as Gaussian noise and Box blur.
-3. **Explore diffusion models**: Investigate the use of diffusion models for image denoising and compare their results with CNN-bases methods.
-4. **Analysis**: Analyse the performance of both techniques, highlighting strengths, weaknesses, and areas for improvement.
+1. **Explore the FFDNet Algorithm**  
+   Investigate the architecture, training process, and performance of the FFDNet algorithm for image denoising, focusing on its ability to handle varying noise levels using a noise-level map.
+
+2. **Implement FFDNet**  
+   Implement the FFDNet algorithm with modifications to adapt to smaller datasets like MNIST and CIFAR, emphasizing computational efficiency and training scalability.
+
+3. **Evaluate on MNIST Dataset and CIFAR Dataset**  
+   Test the implemented FFDNet model on the MNIST and CIFAR datasets, analyzing its ability to denoise images and preserve fine details under varying noise conditions.
+
+4. **Analyze Results and Applications**  
+   Analyze the denoising results, emphasizing practical applications like medical imaging and surveillance, and explore potential future improvements for FFDNet.
 
 ---
 
@@ -34,7 +41,10 @@ To set up and run this project, follow these steps:
    ```bash
    pip install -r requirements.txt
    ```
-
+3. Start the python file
+   ```bash
+   python testing_ffdnet_inspired_cifar.py
+   ```
 ---
 
 ## Acknowledgments
