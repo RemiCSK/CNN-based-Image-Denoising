@@ -175,11 +175,6 @@ plt.show()
 
 
 
-
-
-
-
-
 #### Put test results in a function to test with different noise_std_guess parameters
 def results_test_presentation(noise_std_vector):
     """
