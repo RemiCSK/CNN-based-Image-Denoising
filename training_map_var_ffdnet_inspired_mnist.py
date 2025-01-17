@@ -29,7 +29,7 @@ transform = transforms.Compose([
 
 try:
     trainset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=len(trainset), shuffle=False)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=len(trainset)//6, shuffle=False)
 
     dataiter = iter(trainloader)
     images, labels = next(dataiter)
@@ -122,7 +122,7 @@ for epoch in range(num_epochs):
         running_loss += loss.item()
 
     # Compute the average loss of the epoch
-    average_loss_epoch = running_loss / len(trainloader * len(noise_std_vector))
+    average_loss_epoch = running_loss / (len(trainloader) * len(noise_std_vector))
     print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {average_loss_epoch:.4f}')
 
     # Step the scheduler
