@@ -71,7 +71,7 @@ noise_std_guess = 0.1
 
 # TO CREATE A UNIFORM NOISE LEVEL MAP THAT MATCHES DIMENSIONS OF DOWNSAMPLED IMAGES
 def create_uniform_noise_level_map(batch_size, height, width, noise_std):
-    noise_level_map = torch.full((batch_size, 1, height // 2, width // 2), noise_std) # Creates noise level map with only noise_std values in it.
+    noise_level_map = torch.full((batch_size, 1, height // 2, width // 2), noise_std).to(device) # Creates noise level map with only noise_std values in it.
     return noise_level_map
 
 
@@ -116,19 +116,19 @@ fig, axes = plt.subplots(3, 5, figsize=(15, 9))
 for i in range(5):
     # Plot original images in the first row
     ax = axes[0, i]
-    ax.imshow(images_train[i].cpu().numpy().squeeze(), cmap="gray")
+    ax.imshow(images_train[i].cpu().numpy().transpose(1, 2, 0))  # Transpose to (H, W, C)
     ax.set_title(f'Original {labels_train[i].item()}')
     ax.axis("off")
 
     # Plot noisy images in the second row
     ax = axes[1, i]
-    ax.imshow(noisy_images_train[i].cpu().numpy().squeeze(), cmap="gray")
+    ax.imshow(noisy_images_train[i].cpu().numpy().transpose(1, 2, 0))
     ax.set_title(f'Noisy {labels_train[i].item()}')
     ax.axis("off")
 
     # Plot denoised images in the third row
     ax = axes[2, i]
-    ax.imshow(denoised_images_train[i].cpu().numpy().squeeze(), cmap="gray")
+    ax.imshow(denoised_images_train[i].cpu().numpy().transpose(1, 2, 0))
     ax.set_title(f'Denoised {labels_train[i].item()}')
     ax.axis("off")
 
@@ -171,19 +171,19 @@ def results_test_presentation(noise_std_guess):
     for i in range(5):
         # Plot original images in the first row
         ax = axes[0, i]
-        ax.imshow(images_test[i].cpu().numpy().squeeze(), cmap="gray")
+        ax.imshow(images_test[i].cpu().numpy().transpose(1, 2, 0))
         ax.set_title(f'Original {labels_test[i].item()}')
         ax.axis("off")
 
         # Plot noisy images in the second row
         ax = axes[1, i]
-        ax.imshow(noisy_images_test[i].cpu().numpy().squeeze(), cmap="gray")
+        ax.imshow(noisy_images_test[i].cpu().numpy().transpose(1, 2, 0))
         ax.set_title(f'Noisy {labels_test[i].item()}')
         ax.axis("off")
 
         # Plot denoised images in the third row
         ax = axes[2, i]
-        ax.imshow(denoised_images[i].cpu().numpy().squeeze(), cmap="gray")
+        ax.imshow(denoised_images[i].cpu().numpy().transpose(1, 2, 0))
         ax.set_title(f'Denoised {labels_test[i].item()}')
         ax.axis("off")
 
@@ -210,7 +210,7 @@ print("DONT LOOK AT THE PLOT JUST BELOW, IT'S JUST A FIRST RUN TO INITIALIZE TEN
 poubelle = results_test_presentation(1) # Note that the first time we call for our function, the time will be longer because of initialization of various tensors. That is why we make a first run that we will not use
 
 print("NOW YOU CAN LOOK AT THE FOLLOWING PLOTS")
-
+print("Reminder, true noise std is 0.1")
 results_test_presentation(0.01) # we do a SUPER underestimation of the noise added to the images
 results_test_presentation(0.08) # we do an underestimation of the noise added to the images
 results_test_presentation(0.1) # noise_std_guess = 0.1 (matches the noised used for training)
