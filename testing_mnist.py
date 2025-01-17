@@ -63,7 +63,7 @@ noisy_images_test = add_gaussian_noise(images_test, noise_mean,noise_std).to(dev
 
 
 ##### LOAD THE MODEL #####
-epoch = 30 # number of epoch of the already trained model
+epoch = 100 # number of epoch of the already trained model
 noise_std_train = 0.1 # amount of noise added during the training of the already trained model
 model_path = f'trained_models/small_mnist_model_{epoch}_epochs_{noise_std_train}_noise_std.pth'
 optimizer_path = f'trained_models/optimizer_mnist_model_{epoch}_epochs_{noise_std_train}_noise_std.pth'

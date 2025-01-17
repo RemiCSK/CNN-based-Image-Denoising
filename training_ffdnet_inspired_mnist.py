@@ -68,7 +68,7 @@ optimizer = optim.Adam(model.parameters(), lr=1e-3)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, min_lr=1e-4)
 
 # Training loop
-num_epochs = 10
+num_epochs = 100
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
