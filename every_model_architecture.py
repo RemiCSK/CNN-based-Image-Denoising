@@ -62,3 +62,37 @@ class FFDNet_inspired_small_mnist(nn.Module):
         noise_level_map = noise_level_map.view(batch_size, 1, h, w)   # reshape the noise level map to match dimension of down sample images if necessary
         concat_input = torch.cat([downsampled_images, noise_level_map], dim=1) # concatenates the 4 downsampled images and the noise level map
         return self.model(concat_input)
+
+class FFDNet_inspired_small_cifar(nn.Module):
+
+    def __init__(self):
+        super(FFDNet_inspired_small_color, self).__init__()
+        self.model = nn.Sequential(
+            # First convolution layer
+            nn.Conv2d(in_channels=13, out_channels=64, kernel_size=3, padding=1),  # 12 (downsampled RGB) + 1 (noise map)
+            nn.ReLU(inplace=True),
+            # 2 convolution layers with batch normalization and ReLU
+            *[nn.Sequential(
+                nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
+                nn.BatchNorm2d(64),
+                nn.ReLU(inplace=True)) for _ in range(2)],
+            # Final convolution layer
+            nn.Conv2d(in_channels=64, out_channels=12, kernel_size=3, padding=1),
+            # Reversible up-sampling
+            nn.PixelShuffle(2)
+        )
+
+    def forward(self, x, noise_level_map):
+        device = x.device  # Get the device of the input tensor (e.g., 'cuda:0' or 'cpu')
+        
+        # Reversible down-sampling (PixelUnshuffle)
+        downsampled_images = nn.PixelUnshuffle(2)(x)  # Input shape (B, 3, H, W) -> Output shape (B, 12, H/2, W/2)
+        
+        # Adjust the noise map dimensions to match downsampled images
+        batch_size, _, h, w = downsampled_images.size()
+        noise_level_map = noise_level_map.view(batch_size, 1, h, w).to(device)  # Move noise_level_map to the same device as x
+        
+        # Concatenate downsampled images and noise map
+        concat_input = torch.cat([downsampled_images, noise_level_map], dim=1)  # Shape (B, 13, H/2, W/2)
+        
+        return self.model(concat_input)
