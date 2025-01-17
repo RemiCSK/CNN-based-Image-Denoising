@@ -13,7 +13,7 @@ import torch.optim as optim
 import time
 from torchvision import datasets, transforms
 
-from every_model_architecture import FFDNet_inspired_small_color # Import the FFDNet_inspired_small_cifar model class defined in an other file
+from every_model_architecture import FFDNet_inspired_small_cifar # Import the FFDNet_inspired_small_cifar model class defined in an other file
 
 # CHECK GPU or choose CPU if no GPU available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -82,7 +82,7 @@ noise_std_train = 0.1 # amount of noise added during the training of the already
 model_path = f'trained_models/FFDNet_inspired_small_cifar_{num_epochs}_epochs_{noise_std_train}_noise_std.pth'
 optimizer_path = f'trained_models/optimizer_FFDNet_inspired_small_cifar{num_epochs}_epochs_{noise_std_train}_noise_std.pth'
 
-FFDNet_inspired_small_cifar_model = FFDNet_inspired_small_color()  # Import class from every_model_architecture.py
+FFDNet_inspired_small_cifar_model = FFDNet_inspired_small_cifar()  # Import class from every_model_architecture.py
 print(f"Architecture of small_cifar_model: {FFDNet_inspired_small_cifar_model}")
 optimizer = optim.Adam(FFDNet_inspired_small_cifar_model.parameters())
 
