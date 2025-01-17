@@ -43,10 +43,10 @@ To set up and run this project, follow these steps:
    ```
 3. Start the python file
    ```bash
-   python testing_ffdnet_inspired_mnist.py
+   python testing_ffdnet_inspired_cifar.py
    ```
 ---
-All the algorithms were trained in the train_{} files that created a special file in the trained_model folder with its name, and the test/testing_{} files are files that can be runned. The one we wrote here is the application for the MNIST images but it can be replaced with CIFAR or other named files in the folder.
+All the algorithms were trained in the train_{} files that created a special file in the trained_model folder with its name, and the test/testing_{} files are files that can be runned. The one we wrote here is the application for the CIFAR10 images but it can be replaced with MNIST or other named files in the folder.
 
 
 ## Acknowledgments
