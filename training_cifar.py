@@ -8,7 +8,7 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 import os
 
-from every_model_architecture import FFDNet_inspired_small_color  # Import the FFDNet_inspired_small_cifar model class defined in an other file
+from every_model_architecture import FFDNet_inspired_small_cifar  # Import the FFDNet_inspired_small_cifar model class defined in an other file
 
 # CHECK GPU or choose CPU if no GPU available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -51,9 +51,9 @@ def create_uniform_noise_level_map(batch_size, height, width, noise_std):
 
 
 ######### IMPORT THE MODEL ########
-model = FFDNet_inspired_small_color()
+model = FFDNet_inspired_small_cifar()
 # Print the model architecture
-print(f"FFDNet_inspired_small_cifar architecture: {FFDNet_inspired_small_color}")
+print(f"FFDNet_inspired_small_cifar architecture: {FFDNet_inspired_small_cifar}")
 
 
 
